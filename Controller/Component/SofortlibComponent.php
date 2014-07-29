@@ -95,7 +95,6 @@ class SofortlibComponent extends Component
 
         $transactionData = new SofortLibTransactionData($this->Config['configkey']);
         $transactionData->addTransaction($transaction);
-        $transactionData->setTime($time, $time);
         $transactionData->sendRequest();
         $transactionData->setNumber(1);
 
