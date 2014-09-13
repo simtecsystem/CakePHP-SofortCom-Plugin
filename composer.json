@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "smichaelsen/SofortLib-PHP-Payment": "dev-develop#7b0f6b9e42e9a652b475396bcf3f38caf34fa42e"
+        "smichaelsen/sofortlib-php-payment": "dev-develop#7b0f6b9e42e9a652b475396bcf3f38caf34fa42e"
     },
     "extra": {
         "installer-name": "SofortCom"
