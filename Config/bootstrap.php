@@ -6,10 +6,7 @@
  * put this code into your bootstrap.php, so you can override settings.
  */
 if (is_null(Configure::read('SofortComPlugin'))) {
-	Configure::write('SofortComPlugin', array(
-        // Path to autoloader for SDK autoloader
-        'sdkLoader' => ROOT . DS . 'Vendor' . DS . 'autoload.php', 
-        
+	Configure::write('SofortComPlugin', array(        
         // enter your configuration key
         // you only can create a new configuration key by
         // creating a new Gateway project in your account at sofort.com
@@ -39,8 +36,3 @@ if (is_null(Configure::read('SofortComPlugin'))) {
 }
 
 /** END SofortComPlugin Configuration */
-
-
-$paypal_settings = Configure::read('SofortComPlugin');
-require_once $paypal_settings['sdkLoader'];
-unset ($paypal_settings);
