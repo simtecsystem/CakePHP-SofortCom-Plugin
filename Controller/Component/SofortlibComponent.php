@@ -75,10 +75,9 @@ class SofortlibComponent extends Component
     public function HandleNotifyUrl($eShopId, $status, $ip, $rawPostStream = 'php://input')
     {
         debug($this->Config);
-        $shop_id = Security::rijndael(
+        $shop_id = Security::decrypt(
                 self::Base64Decode($eShopId),
-                Configure::read('Security.salt'),
-                'decrypt');
+                Configure::read('Security.salt'));
 
         $notification = new SofortLibNotification();
         $success = $notification->getNotification(
@@ -115,7 +114,7 @@ class SofortlibComponent extends Component
         if (empty($this->shop_id))
             throw new InvalidArgumentException("No shop_id set.");
 
-        $eShopId = rawurlencode(self::Base64Encode(Security::rijndael($this->shop_id, Configure::read('Security.salt'), 'encrypt')));
+        $eShopId = rawurlencode(self::Base64Encode(Security::encrypt($this->shop_id, Configure::read('Security.salt'))));
         $notificationUrl = Router::url('/SofortComPayment/Notify/' . $eShopId, true);
         foreach ($this->states as $state)
             $this->Sofortueberweisung->setNotificationUrl($notificationUrl . '/' . $state, $state);
