@@ -1,6 +1,6 @@
 <?php
 
-$settings['SofortComPlugin'] = array(
+$settings['SofortComPlugin'] = [
     // Path to autoloader for SDK autoloader
     'sdkLoader' => ROOT . DS . 'Vendor' . DS . 'autoload.php',
 
@@ -25,8 +25,8 @@ $settings['SofortComPlugin'] = array(
 
     // The conditions are used if you use the
     // SofortlibComponent::NeutralizeFee function
-    'conditions' => array(
+    'conditions' => [
         'fee' => 25,              // sofort.com fixed fee in cents
         'fee_relative' => '0.009' // relative sofort.com fee
-    )
-);
+    ]
+];
