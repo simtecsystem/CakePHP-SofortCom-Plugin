@@ -176,10 +176,11 @@ class SofortlibComponent extends Component
 
     private static function _getConditionsFromConfig()
     {
-        if (empty($this->Config['conditions']))
+        $config = Configure::read('SofortComPlugin');
+        if (empty($config['conditions']))
             throw new InvalidArgumentException('Missing SofortCom conditions.');
 
-        $conditions = $this->Config['conditions'];
+        $conditions = $config['conditions'];
         if (!isset($conditions['fee']) || !isset($conditions['fee_relative']))
             throw new InvalidArgumentException('Missing SofortCom condition fees.');
 

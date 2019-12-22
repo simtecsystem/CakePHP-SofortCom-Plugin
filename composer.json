@@ -13,10 +13,15 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "smichaelsen/sofortlib-php-payment": "dev-develop#7b0f6b9e42e9a652b475396bcf3f38caf34fa42e",
-        "cakephp/cakephp": ">=2.5.0 <3.0"
+        "smichaelsen/sofortlib-php-payment": "dev-develop#7b0f6b9e42e9a652b475396bcf3f38caf34fa42e"
     },
     "extra": {
         "installer-name": "SofortCom"
+    },
+    "config": {
+        "vendor-dir": "Vendor"
+    },    
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.27"
     }
 }
