@@ -46,7 +46,7 @@ use Cake\Core\Configure\Engine\PhpConfig;
 use Cake\Datasource\ConnectionManager;
 
 Configure::config('default', new PhpConfig());
-// Configure::load('app', 'default', false);
+Configure::load('app', 'default', false);
 Configure::load('SofortCom', 'default', false);
 // Cache::setConfig(Configure::consume('Cache'));
-// ConnectionManager::setConfig('test', Configure::consume('Datasources.test'));
+ConnectionManager::setConfig('test', Configure::consume('Datasources.test'));
