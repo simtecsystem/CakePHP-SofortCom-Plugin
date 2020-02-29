@@ -13,10 +13,8 @@ Installation
 
 If you are using composer simply add the following requirement to your composer file:
 
-```json
-{
-  "require": { "hakito/cakephp-sofortcom-plugin": "dev-master" }
-}
+```bash
+composer require hakito/sofortcom-plugin
 ```
 
 Otherwise download the plugin to app/Plugin/SofortCom.
@@ -24,17 +22,11 @@ Otherwise download the plugin to app/Plugin/SofortCom.
 Configuration
 -------------
 
-Simply load the plugin in your bootstrap:
+In your app.local.php add an entry for SofortCom
 
 ```php
-CakePlugin::load('SofortCom');
-```
-
-```php
-Configure::write('SofortComPlugin', [
-    // Path to autoloader for SDK autoloader
-    'sdkLoader' => ROOT . DS . 'Vendor' . DS . 'autoload.php',
-
+[
+  'SofortCom' => [
     // enter your configuration key
     // you only can create a new configuration key by
     // creating a new Gateway project in your account at sofort.com
@@ -60,6 +52,6 @@ Configure::write('SofortComPlugin', [
         'fee' => 25,              // sofort.com fixed fee in cents
         'fee_relative' => '0.009' // relative sofort.com fee
     ]
-]);
+  ]
+];
 ```
-

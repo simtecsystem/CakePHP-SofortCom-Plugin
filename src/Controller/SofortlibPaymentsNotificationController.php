@@ -1,5 +1,7 @@
 <?php
 
+namespace SofortCom\Controller;
+
 class SofortlibPaymentsNotificationController extends AppController
 {
     public $components = array('SofortCom.Sofortlib');

@@ -1,5 +1,12 @@
 <?php
-App::uses('Component', 'Controller');
+namespace SofortCom\Controller\Component;
+
+use Cake\Core\Configure;
+use Cake\Controller\Component;
+
+use SofortCom\Model\SofortComNotification;
+use SofortCom\Model\SofortComShopTransaction;
+
 class SofortlibComponent extends Component
 {
     private $Sofortueberweisung;
@@ -9,23 +16,22 @@ class SofortlibComponent extends Component
     private $newTransactionCallback;
     private $newTransactionCallbackArgs;
     private $shop_id;
-    
+
     /** @var \Controller */
     private $Controller;
 
-    public function __construct($collection)
+    public function initialize($config)
     {
-        parent::__construct($collection);
-        $this->Config = Configure::read('SofortComPlugin');
+        parent::initialize($config);
+        $this->Config = Configure::read('SofortCom');
         $this->Sofortueberweisung = new Sofortueberweisung($this->Config['configkey']);
         if (!empty($this->Config['currency']))
             $this->setCurrencyCode($this->Config['currency']);
     }
 
-    public function initialize(\Controller $controller)
+    public function startup($event)
     {
-        parent::initialize($controller);
-        $this->Controller = $controller;
+        $this->Controller = $event->getSubject();
     }
 
     /**
@@ -39,7 +45,7 @@ class SofortlibComponent extends Component
         if(method_exists($this->Sofortueberweisung, $name))
         {
             if (in_array(strtolower($name), $this->protectedMethods))
-                throw new InvalidArgumentException("Calling $name is not allowed.");
+                throw new \InvalidArgumentException("Calling $name is not allowed.");
 
             return call_user_func_array(array($this->Sofortueberweisung, $name), $arguments);
         }
@@ -88,7 +94,7 @@ class SofortlibComponent extends Component
 
         $transaction = $notification->getTransactionId();
         $time = $notification->getTime();
-        App::uses('SofortComNotification', 'SofortCom.Model');
+
         $SofortComNotification = new SofortComNotification();
         $SofortComNotification->Add($transaction, $status, $time, $ip);
 
@@ -107,19 +113,18 @@ class SofortlibComponent extends Component
      * Calls Sofortueberweisung::sendRequest and redirects the buyer to
      * the payment url.
      * @throws SofortLibException when Sofortueberweisung returns an error
-     * @throws InvalidArgumentException when no shop_id has been set.
+     * @throws \InvalidArgumentException when no shop_id has been set.
      */
     public function PaymentRedirect()
     {
         if (empty($this->shop_id))
-            throw new InvalidArgumentException("No shop_id set.");
+            throw new \InvalidArgumentException("No shop_id set.");
 
         $eShopId = rawurlencode(self::Base64Encode(Security::encrypt($this->shop_id, Configure::read('Security.salt'))));
         $notificationUrl = Router::url('/SofortComPayment/Notify/' . $eShopId, true);
         foreach ($this->states as $state)
             $this->Sofortueberweisung->setNotificationUrl($notificationUrl . '/' . $state, $state);
 
-        App::uses('SofortComShopTransaction', 'SofortCom.Model');
         $SofortComShopTransaction = new SofortComShopTransaction();
         $this->Sofortueberweisung->sendRequest();
         if ($this->Sofortueberweisung->isError())
@@ -154,7 +159,7 @@ class SofortlibComponent extends Component
      * @param type $amount
      * @return type amount plus neutralization amount so when Sofort.com subtract it's fee
      * the intended amount will be received.
-     * @throws InvalidArgumentException if SofortCom conditions are not set in config
+     * @throws \InvalidArgumentException if SofortCom conditions are not set in config
      */
     public static function NeutralizeFee($amount)
     {
@@ -166,7 +171,7 @@ class SofortlibComponent extends Component
      *
      * @param type $amount
      * @return type Sofort.com fee based on amount
-     * @throws InvalidArgumentException if SofortCom conditions are not set in config
+     * @throws \InvalidArgumentException if SofortCom conditions are not set in config
      */
     public static function CalculateFee($amount)
     {
@@ -176,13 +181,13 @@ class SofortlibComponent extends Component
 
     private static function _getConditionsFromConfig()
     {
-        $config = Configure::read('SofortComPlugin');
+        $config = Configure::read('SofortCom');
         if (empty($config['conditions']))
-            throw new InvalidArgumentException('Missing SofortCom conditions.');
+            throw new \InvalidArgumentException('Missing SofortCom conditions.');
 
         $conditions = $config['conditions'];
         if (!isset($conditions['fee']) || !isset($conditions['fee_relative']))
-            throw new InvalidArgumentException('Missing SofortCom condition fees.');
+            throw new \InvalidArgumentException('Missing SofortCom condition fees.');
 
         return $conditions;
     }
@@ -198,7 +203,7 @@ class SofortlibComponent extends Component
     }
 }
 
-class SofortLibException extends Exception
+class SofortLibException extends \Exception
 {
     public $errors;
 

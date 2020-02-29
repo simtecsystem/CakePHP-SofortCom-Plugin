@@ -1,16 +1,10 @@
 <?php
-/**
- * BEGIN SofortComPlugin Configuration
- * Use these settings to set defaults for the SofortCom component.
- *
- * put this code into your bootstrap.php, so you can override settings.
- */
-if (is_null(Configure::read('SofortComPlugin'))) {
-	Configure::write('SofortComPlugin', array(        
+return [
+    'SofortCom' => [
         // enter your configuration key
         // you only can create a new configuration key by
         // creating a new Gateway project in your account at sofort.com
-        'configkey' => '12345:12345:5dbdad2bc861d907eedfd9528127d002',
+        'configkey' => 'dummy:key',
 
         // This is the name of your function in your AppController
         // that will be called when the notification url gets called
@@ -24,15 +18,13 @@ if (is_null(Configure::read('SofortComPlugin'))) {
 
         // Default CurrencyCode.
         // You can override this when preparing the payment request.
-        'currency' => 'EUR', 
+        'currency' => 'EUR',
 
         // The conditions are used if you use the
         // SofortlibComponent::NeutralizeFee function
-        'conditions' => array(
+        'conditions' => [
             'fee' => 25,              // sofort.com fixed fee in cents
             'fee_relative' => '0.009' // relative sofort.com fee
-        )
-    ));
-}
-
-/** END SofortComPlugin Configuration */
+        ]
+    ]
+];

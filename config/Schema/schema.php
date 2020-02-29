@@ -1,4 +1,6 @@
 <?php
+namespace config\Schema;
+
 class AppSchema extends CakeSchema {
 
 	public function before($event = array()) {

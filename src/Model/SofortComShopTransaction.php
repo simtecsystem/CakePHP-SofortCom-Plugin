@@ -1,12 +1,14 @@
 <?php
 
-App::uses('AppModel', 'Model');
+namespace SofortCom\Model;
+
+use App\Model\AppModel;
 
 /**
- * SofortComNotification Model
+ * SofortComShopTransaction Model
  *
  */
-class SofortComNotification extends AppModel
+class SofortComShopTransaction extends AppModel
 {
 
     /**
@@ -14,14 +16,7 @@ class SofortComNotification extends AppModel
      *
      * @var mixed False or table name
      */
-    public $useTable = 'SofortComNotifications';
-
-    /**
-     * Display field
-     *
-     * @var string
-     */
-    public $displayField = 'id';
+    public $useTable = 'SofortComShopTransactions';
 
     /**
      * Validation rules
@@ -39,19 +34,9 @@ class SofortComNotification extends AppModel
             //'on' => 'create', // Limit validation to 'create' or 'update' operations
             ),
         ),
-        'time' => array(
-            'notEmpty' => array(
-                'rule' => array('notEmpty'),
-            //'message' => 'Your custom message here',
-            //'allowEmpty' => false,
-            //'required' => false,
-            //'last' => false, // Stop validation after this rule
-            //'on' => 'create', // Limit validation to 'create' or 'update' operations
-            ),
-        ),
-        'status' => array(
-            'notEmpty' => array(
-                'rule' => array('notEmpty'),
+        'shop_id' => array(
+            'numeric' => array(
+                'rule' => array('numeric'),
             //'message' => 'Your custom message here',
             //'allowEmpty' => false,
             //'required' => false,
@@ -61,13 +46,16 @@ class SofortComNotification extends AppModel
         ),
     );
 
-    public function Add($transaction, $status, $time, $ip)
+    /**
+     *
+     * @param type $transaction
+     * @param type $shop_id
+     */
+    public function Add($transaction, $shop_id)
     {
         $data = array(
             'transaction' => $transaction,
-            'status' => $status,
-            'time' => $time,
-            'ip' => $ip,
+            'shop_id' => $shop_id,
         );
 
         $this->create();
