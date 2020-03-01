@@ -2,11 +2,18 @@
 
 namespace SofortCom\Controller;
 
-class SofortlibPaymentsNotificationController extends AppController
+class PaymentsNotificationController extends AppController
 {
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->loadComponent('SofortCom.Sofortlib', []);
+    }
+
     public $components = array('SofortCom.Sofortlib');
 
-    public function notify($eShopId, $status)
+    public function Notify($eShopId, $status)
     {
         $ip = $this->request->clientIp();
         $this->Sofortlib->HandleNotifyUrl($eShopId, $status, $ip);
