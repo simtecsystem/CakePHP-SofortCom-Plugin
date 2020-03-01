@@ -34,11 +34,14 @@ class NotificationsTable extends Table
 
     public function Add($transaction, $status, $time, $ip)
     {
-        $record = new \Cake\ORM\Entity();
-        $record->sc_transaction = $transaction;
-        $record->status = $status;
-        $record->time = $time;
-        $record->ip = $ip;
+        $record = $this->newEntity(
+            [
+                'sc_transaction' => $transaction,
+                'status' => $status,
+                'time' => $time,
+                'ip' => $ip
+            ]
+        );
 
         return $this->saveOrFail($record);
     }

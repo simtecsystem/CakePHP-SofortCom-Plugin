@@ -30,9 +30,10 @@ class ShopTransactionsTable extends Table
      */
     public function Add($transaction, $shop_id)
     {
-        $record = new \Cake\ORM\Entity();
-        $record->sc_transaction = $transaction;
-        $record->shop_id = $shop_id;
+        $record = $this->newEntity([
+            'sc_transaction' => $transaction,
+            'shop_id' => $shop_id
+        ]);
 
         return $this->saveOrFail($record);
     }
