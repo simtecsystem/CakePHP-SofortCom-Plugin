@@ -7,7 +7,7 @@ use Cake\Event\EventList;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
-use SofortCom\Model\Table\Notifications;
+use SofortCom\Model\Table\NotificationsTable;
 /**
  * @var \SofortCom\Model\Table\NotificationsTable Notifications
  */
