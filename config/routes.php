@@ -1,12 +1,20 @@
 <?php
 
-/* Add route for handling payment notifications */
-Router::connect('/SofortComPayment/Notify/:eShopId/:status', array(
-	'plugin' => 'SofortCom',
-	'controller' => 'SofortlibPaymentsNotification',
-	'action' => 'notify',
-        ),
-    array(
-        'pass' => array('eShopId', 'status')
-         )
+use Cake\Routing\RouteBuilder;
+use Cake\Routing\Router;
+
+Router::plugin(
+    'SofortCom',
+    ['path' => '/SofortComPayment'],
+    function (RouteBuilder $routes)
+    {
+        /* Add route for handling payment notifications */
+        $routes->get('/Notify/:eShopId/:status',
+            [
+                'controller' => 'PaymentsNotification',
+                'action' => 'Notify'
+            ],
+        )
+            ->setPass(['eShopId', 'status']);
+    }
 );

@@ -1,21 +1,27 @@
 <?php
 namespace SofortCom\Controller\Component;
 
+use Base64Url\Base64Url;
+
 use Cake\Core\Configure;
 use Cake\Controller\Component;
+use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
+use Cake\Utility\Security;
 
-use SofortCom\Model\SofortComNotification;
-use SofortCom\Model\SofortComShopTransaction;
+use SofortCom\Exceptions;
+use SofortCom\Model\Table\Notifications;
+use SofortCom\Model\Table\ShopTransactions;
 
 class SofortlibComponent extends Component
 {
     private $Sofortueberweisung;
     private $Config;
-    private $protectedMethods = array('setnotificationurl', 'sendrequest');
-    private $states = array('loss', 'pending', 'received', 'refunded', 'untraceable');
-    private $newTransactionCallback;
-    private $newTransactionCallbackArgs;
+    private $protectedMethods = ['setnotificationurl', 'sendrequest'];
+    private $states = ['loss', 'pending', 'received', 'refunded', 'untraceable'];
     private $shop_id;
+    private $Notifications;
 
     /** @var \Controller */
     private $Controller;
@@ -24,9 +30,11 @@ class SofortlibComponent extends Component
     {
         parent::initialize($config);
         $this->Config = Configure::read('SofortCom');
-        $this->Sofortueberweisung = new Sofortueberweisung($this->Config['configkey']);
+        $this->Sofortueberweisung = new \Sofortueberweisung($this->Config['configkey']);
         if (!empty($this->Config['currency']))
             $this->setCurrencyCode($this->Config['currency']);
+        $this->Notifications = TableRegistry::getTableLocator()->get('SofortCom.Notifications');
+        $this->ShopTransactions = TableRegistry::getTableLocator()->get('SofortCom.ShopTransactions');
     }
 
     public function startup($event)
@@ -39,6 +47,7 @@ class SofortlibComponent extends Component
      * @param type $name Function name
      * @param type $arguments Function arguments
      * @return type mixed
+     * @throws \InvalidArgumentException when trying to call setnotificationurl() or sendrequest()
      */
     public function __call($name, $arguments)
     {
@@ -47,23 +56,8 @@ class SofortlibComponent extends Component
             if (in_array(strtolower($name), $this->protectedMethods))
                 throw new \InvalidArgumentException("Calling $name is not allowed.");
 
-            return call_user_func_array(array($this->Sofortueberweisung, $name), $arguments);
+            return call_user_func_array([$this->Sofortueberweisung, $name], $arguments);
         }
-    }
-
-    /**
-     * Set callback function that will be called on a successful payment request
-     * response. The first argument for the callback will be the transaction id,
-     * the 2nd will be the payment url. You might provide additional arguments
-     * for your callback function.
-     * @param callable $callable that will be called on successful payment
-     * request.
-     * @param array $args Optional additional args for the callable.
-     */
-    public function setNewTransactionCallback($callable, $args = array())
-    {
-        $this->newTransactionCallback = $callable;
-        $this->newTransactionCallbackArgs = $args;
     }
 
     /**
@@ -78,35 +72,51 @@ class SofortlibComponent extends Component
         $this->shop_id = $id;
     }
 
-    public function HandleNotifyUrl($eShopId, $status, $ip, $rawPostStream = 'php://input')
+    protected function ParseNotification($rawPostStream)
     {
-        debug($this->Config);
-        $shop_id = Security::decrypt(
-                self::Base64Decode($eShopId),
-                Configure::read('Security.salt'));
-
-        $notification = new SofortLibNotification();
+        $notification = new \SofortLibNotification();
         $success = $notification->getNotification(
                 file_get_contents($rawPostStream)
         );
         if ($success === false)
-            throw new SofortLibNotificationException($notification);
+            throw new Exceptions\NotificationException($notification);
+        return $notification;
+    }
 
+    protected function BuildTransactionData()
+    {
+        return new \SofortLibTransactionData($this->Config['configkey']);
+    }
+
+    public function HandleNotifyUrl($eShopId, $status, $ip, $rawPostStream = 'php://input')
+    {
+        $shop_id = Security::decrypt(
+                Base64Url::decode($eShopId),
+                Configure::read('Security.salt'));
+
+        $notification = $this->ParseNotification($rawPostStream);
         $transaction = $notification->getTransactionId();
         $time = $notification->getTime();
 
-        $SofortComNotification = new SofortComNotification();
-        $SofortComNotification->Add($transaction, $status, $time, $ip);
+        $this->Notifications->Add($transaction, $status, $time, $ip);
 
-        $transactionData = new SofortLibTransactionData($this->Config['configkey']);
+        $transactionData = $this->BuildTransactionData();
         $transactionData->addTransaction($transaction);
         $transactionData->sendRequest();
         $transactionData->setNumber(1);
 
-        call_user_func_array(
-                array($this->Controller, $this->Config['notifyCallback']),
-                array($shop_id, $status, $transaction, $time, $transactionData)
-        );
+        $event = new Event('SofortCom.Controller.Component.SofortlibComponent.Notify', $this,
+        [
+            'args' => [
+                'shop_id' => $shop_id,
+                'status' =>  $status,
+                'transaction' => $transaction,
+                'time' => $time,
+                'data' => $transactionData
+            ]
+        ]);
+
+        $this->Controller->getEventManager()->dispatch($event);
     }
 
     /**
@@ -121,16 +131,23 @@ class SofortlibComponent extends Component
             throw new \InvalidArgumentException("No shop_id set.");
 
         $eShopId = rawurlencode(self::Base64Encode(Security::encrypt($this->shop_id, Configure::read('Security.salt'))));
-        $notificationUrl = Router::url('/SofortComPayment/Notify/' . $eShopId, true);
+        $urlOptions = [
+            'controller' => 'PaymentsNotification',
+            'action' => 'Notify',
+            'plugin' => 'SofortCom',
+            'eShopId' => $eShopId];
         foreach ($this->states as $state)
-            $this->Sofortueberweisung->setNotificationUrl($notificationUrl . '/' . $state, $state);
+        {
+            $urlOptions['status'] = $state;
+            $notificationUrl = Router::url($urlOptions, true);
+            $this->Sofortueberweisung->setNotificationUrl($notificationUrl, $state);
+        }
 
-        $SofortComShopTransaction = new SofortComShopTransaction();
         $this->Sofortueberweisung->sendRequest();
         if ($this->Sofortueberweisung->isError())
         {
             $error = $this->Sofortueberweisung->getError();
-            $exception = new SofortLibRequestException($error);
+            $exception = new Exceptions\RequestException($error);
             $exception->errors = $this->Sofortueberweisung->getErrors();
             throw $exception;
         }
@@ -138,25 +155,23 @@ class SofortlibComponent extends Component
         $transaction = $this->Sofortueberweisung->getTransactionId();
         $payment_url = $this->Sofortueberweisung->getPaymentUrl();
 
-        $SofortComShopTransaction->Add($transaction, $this->shop_id);
+        $this->ShopTransactions->Add($transaction, $this->shop_id);
 
-        if (!empty($this->newTransactionCallback) && is_callable($this->newTransactionCallback))
-        {
-            $args = array($transaction, $payment_url);
+        $event = new Event('SofortCom.Controller.Component.SofortlibComponent.NewTransaction', $this,
+        [
+            'args' => [
+                'transaction' => $transaction,
+                'payment_url' => $payment_url
+            ]
+        ]);
+        $this->Controller->getEventManager()->dispatch($event);
 
-            call_user_func_array(
-                    $this->newTransactionCallback,
-                    array_merge($args, $this->newTransactionCallbackArgs)
-            );
-        }
-
-        header('Location: ' . $payment_url);
-        exit;
+        return $this->Controller->redirect($payment_url);
     }
 
     /**
      *
-     * @param type $amount
+     * @param type $amount in cents
      * @return type amount plus neutralization amount so when Sofort.com subtract it's fee
      * the intended amount will be received.
      * @throws \InvalidArgumentException if SofortCom conditions are not set in config
@@ -169,14 +184,14 @@ class SofortlibComponent extends Component
 
     /**
      *
-     * @param type $amount
-     * @return type Sofort.com fee based on amount
+     * @param type $amount in cents
+     * @return type Sofort.com fee in cents based on amount
      * @throws \InvalidArgumentException if SofortCom conditions are not set in config
      */
     public static function CalculateFee($amount)
     {
         $conditions = self::_getConditionsFromConfig();
-        return $amount * $conditions['fee_relative'] + $conditions['fee'];
+        return ceil($amount * $conditions['fee_relative'] + $conditions['fee']);
     }
 
     private static function _getConditionsFromConfig()
@@ -190,47 +205,5 @@ class SofortlibComponent extends Component
             throw new \InvalidArgumentException('Missing SofortCom condition fees.');
 
         return $conditions;
-    }
-
-    public static function Base64Encode($s)
-    {
-        return str_replace(array('\\', '/'), array(',', '-'), base64_encode($s));
-    }
-
-    public static function Base64Decode($s)
-    {
-        return base64_decode(str_replace(array(',', '-'), array('\\', '/'), $s));
-    }
-}
-
-class SofortLibException extends \Exception
-{
-    public $errors;
-
-    public function __construct($message = null, $code = null, $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-    }
-}
-
-class SofortLibNotificationException extends SofortLibException
-{
-    public function __construct(SofortLibNotification $sofortLibNotification)
-    {
-        $message = 'Invalid xml data.';
-        if (!empty($sofortLibNotification->errors['error']['message']))
-        {
-            $message = $sofortLibNotification->errors['error']['message'];
-            $this->errors = $sofortLibNotification->errors;
-        }
-        parent::__construct($message);
-    }
-}
-
-class SofortLibRequestException extends SofortLibException
-{
-    public function __construct($message = null, $code = null, $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
     }
 }

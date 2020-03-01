@@ -23,11 +23,12 @@
     },
     "require": {
         "cakephp/cakephp": "^3.7",
-        "smichaelsen/sofortlib-php-payment": "dev-develop#7b0f6b9e42e9a652b475396bcf3f38caf34fa42e"
+        "smichaelsen/sofortlib-php-payment": "dev-develop#7b0f6b9e42e9a652b475396bcf3f38caf34fa42e",
+        "spomky-labs/base64url": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0",
-        "hakito/publisher": "^1.0"
+        "hakito/publisher": "^1.2.0"
     },
     "extra": {
         "installer-name": "SofortCom"

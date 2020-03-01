@@ -20,4 +20,8 @@ return
             'timezone' => 'UTC'
         ],
     ],
+
+    'Security' => [
+        'salt' => 'DO NOT USE THIS KEY IN PRODUCTION ENVIRONMENT'
+    ]
 ];
