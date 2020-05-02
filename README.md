@@ -19,6 +19,15 @@ composer require hakito/sofortcom-plugin
 
 Otherwise download the plugin to app/Plugin/SofortCom.
 
+Creating tables
+---------------
+
+Create the database tables with the following command:
+
+```bash
+bin/cake migrations migrate -p SofortCom
+```
+
 Configuration
 -------------
 
