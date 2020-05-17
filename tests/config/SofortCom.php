@@ -4,7 +4,10 @@ return [
         // enter your configuration key
         // you only can create a new configuration key by
         // creating a new Gateway project in your account at sofort.com
-        'configkey' => 'dummy:key',
+        'configkey' => 'dummy:api:key',
+
+        // Encryption key for sending encrypted data to SofortCom
+        'encryptionKey' => 'A_SECRET_KEY_MUST_BE_32_BYTES_LONG',
 
         // This is the name of your function in your AppController
         // that will be called when the notification url gets called

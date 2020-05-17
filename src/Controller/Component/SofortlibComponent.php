@@ -22,6 +22,7 @@ class SofortlibComponent extends Component
     private $states = ['loss', 'pending', 'received', 'refunded', 'untraceable'];
     private $shop_id;
     private $Notifications;
+    private $encryptionKey;
 
     /** @var \Controller */
     private $Controller;
@@ -30,6 +31,7 @@ class SofortlibComponent extends Component
     {
         parent::initialize($config);
         $this->Config = Configure::read('SofortCom');
+        $this->encryptionKey = $this->Config['encryptionKey'];
         $this->Sofortueberweisung = new \Sofortueberweisung($this->Config['configkey']);
         if (!empty($this->Config['currency']))
             $this->setCurrencyCode($this->Config['currency']);
@@ -92,7 +94,7 @@ class SofortlibComponent extends Component
     {
         $shop_id = Security::decrypt(
                 Base64Url::decode($eShopId),
-                Configure::read('Security.salt'));
+                $this->encryptionKey);
 
         $notification = $this->ParseNotification($rawPostStream);
         $transaction = $notification->getTransactionId();
@@ -130,7 +132,7 @@ class SofortlibComponent extends Component
         if (empty($this->shop_id))
             throw new \InvalidArgumentException("No shop_id set.");
 
-        $eShopId = rawurlencode(self::Base64Encode(Security::encrypt($this->shop_id, Configure::read('Security.salt'))));
+        $eShopId = rawurlencode(self::Base64Encode(Security::encrypt($this->shop_id, $this->encryptionKey)));
         $urlOptions = [
             'controller' => 'PaymentsNotification',
             'action' => 'Notify',

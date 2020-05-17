@@ -120,8 +120,9 @@ class SofortlibComponentTest extends TestCase {
         $pComponent->Notifications->expects($this->once())
             ->method('Add')
             ->with('trans', 'state', '2020-01-01', '1.2.3.4');
+        $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
 
-        $eShopId = Base64Url::encode(Security::encrypt('shop', Configure::read('Security.salt')));
+        $eShopId = Base64Url::encode(Security::encrypt('shop', $pComponent->encryptionKey));
 
         $component->HandleNotifyUrl($eShopId, 'state', '1.2.3.4', 'php://memory');
         $this->assertEventFiredWith('SofortCom.Controller.Component.SofortlibComponent.Notify',
