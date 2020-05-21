@@ -137,6 +137,7 @@ class SofortlibComponent extends Component
             throw new \UnexpectedValueException("Encrypted shop_id is empty");
 
         $urlOptions = [
+            '_method' => 'post',
             'controller' => 'PaymentsNotification',
             'action' => 'Notify',
             'plugin' => 'SofortCom',

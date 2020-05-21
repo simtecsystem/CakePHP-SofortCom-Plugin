@@ -33,7 +33,7 @@ class PaymentsNotificationControllerTest extends TestCase
     {
         $this->mockComponent = false;
         try {
-            $this->get('/SofortComPayment/Notify/foo/bar');
+            $this->post('/SofortComPayment/Notify/foo/bar');
         } catch (\Throwable $th) {}
         $this->assertInstanceOf(\SofortCom\Controller\Component\SofortlibComponent::class, $this->controller->Sofortlib);
         $this->assertNotEquals($this->component, $this->controller->Sofortlib);
@@ -49,6 +49,6 @@ class PaymentsNotificationControllerTest extends TestCase
             ->method('HandleNotifyUrl')
             ->with('foo', 'bar', '1.2.3.4');
 
-        $this->get('/SofortComPayment/Notify/foo/bar');
+        $this->post('/SofortComPayment/Notify/foo/bar');
     }
 }
