@@ -130,9 +130,12 @@ class SofortlibComponent extends Component
     public function PaymentRedirect()
     {
         if (empty($this->shop_id))
-            throw new \InvalidArgumentException("No shop_id set.");
+            throw new \UnexpectedValueException("No shop_id set.");
 
-        $eShopId = rawurlencode(self::Base64Encode(Security::encrypt($this->shop_id, $this->encryptionKey)));
+        $eShopId = rawurlencode(Base64Url::encode(Security::encrypt($this->shop_id, $this->encryptionKey)));
+        if (empty($eShopId))
+            throw new \UnexpectedValueException("Encrypted shop_id is empty");
+
         $urlOptions = [
             'controller' => 'PaymentsNotification',
             'action' => 'Notify',

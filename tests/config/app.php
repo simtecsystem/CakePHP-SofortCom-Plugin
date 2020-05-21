@@ -79,5 +79,5 @@ return
             'url' => env('CACHE_CAKEROUTES_URL', null),
         ],
 
-    ]    
+    ]
 ];

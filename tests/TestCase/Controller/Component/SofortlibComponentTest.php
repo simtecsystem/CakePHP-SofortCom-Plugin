@@ -137,7 +137,7 @@ class SofortlibComponentTest extends TestCase {
 
     public function testPaymentRedirectThrowsArgumentException()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->Component->PaymentRedirect();
     }
 
@@ -156,7 +156,7 @@ class SofortlibComponentTest extends TestCase {
 
         $this->PComponent->Sofortueberweisung->expects($this->exactly(5))
             ->method('setNotificationUrl')
-            ->with($this->stringContains('http://example.com/SofortComPayment/Notify/'));
+            ->with($this->stringStartsWith('http://example.com/SofortComPayment/Notify/'));
 
         $this->PComponent->Sofortueberweisung->expects($this->once())
             ->method('sendRequest');
