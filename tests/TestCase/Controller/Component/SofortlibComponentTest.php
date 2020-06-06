@@ -122,16 +122,71 @@ class SofortlibComponentTest extends TestCase {
             ->with('trans', 'state', '2020-01-01', '1.2.3.4');
         $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
 
-        $eShopId = Base64Url::encode(Security::encrypt('shop', $pComponent->encryptionKey));
+        $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));
+
+        \Cake\Event\EventManager::instance()->on('SofortCom.Controller.Component.SofortlibComponent.Notify',
+        function ($event, $args)
+        {
+            $args['handled'] = true;
+        });
 
         $component->HandleNotifyUrl($eShopId, 'state', '1.2.3.4', 'php://memory');
+    }
+
+    public function testHandleNotifyUrlThrowsExceptionIfUnhandled()
+    {
+        $notification = new \SofortLibNotification();
+        $pNotification = new Published($notification);
+        $pNotification->_transactionId = 'trans';
+        $pNotification->_time = '2020-01-01';
+
+        $component = $this->getMockBuilder(SofortlibComponent::class)
+            ->setConstructorArgs([$this->registry])
+            ->disableOriginalConstructor()
+            ->setMethods(['ParseNotification', 'BuildTransactionData'])
+            ->getMock();
+        $component->startup($this->startUp);
+
+        $component->expects($this->once())
+            ->method('ParseNotification')
+            ->willReturn($notification);
+
+        $mTransactionData = $this->getMockBuilder(\SofortLibTransactionData::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['addTransaction', 'sendRequest', 'setNumber'])->getMock();
+        $mTransactionData->expects($this->once())->method('addTransaction')->with('trans');
+        $mTransactionData->expects($this->once())->method('sendRequest');
+        $mTransactionData->expects($this->once())->method('setNumber')->with(1);
+
+        $component->expects($this->once())
+            ->method('BuildTransactionData')
+            ->willReturn($mTransactionData);
+
+        $pComponent = new Published($component, SofortlibComponent::class);
+        $pComponent->Notifications = $this->getMockForModel('SofortCom.Notifications', ['Add']);
+        $pComponent->Notifications->expects($this->once())
+            ->method('Add')
+            ->with('trans', 'state', '2020-01-01', '1.2.3.4');
+        $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
+
+        $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));
+
+        $exceptionThrown = false;
+        try {
+            $component->HandleNotifyUrl($eShopId, 'state', '1.2.3.4', 'php://memory');
+        } catch (Exceptions\UnhandledNotificationException $th) {
+            $exceptionThrown = true;
+        }
+        $this->assertTrue($exceptionThrown);
+
         $this->assertEventFiredWith('SofortCom.Controller.Component.SofortlibComponent.Notify',
             'args', [
-                'shop_id' => 'shop',
+                'shop_id' => 'order_123',
                 'status' =>'state',
                 'transaction' => 'trans',
                 'time' => '2020-01-01',
-                'data' => $mTransactionData
+                'data' => $mTransactionData,
+                'handled' => false
             ], $this->Controller->getEventManager());
     }
 

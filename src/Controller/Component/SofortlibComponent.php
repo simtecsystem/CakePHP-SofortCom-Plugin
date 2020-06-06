@@ -107,6 +107,7 @@ class SofortlibComponent extends Component
         $transactionData->sendRequest();
         $transactionData->setNumber(1);
 
+        $handled = false;
         $event = new Event('SofortCom.Controller.Component.SofortlibComponent.Notify', $this,
         [
             'args' => [
@@ -114,11 +115,15 @@ class SofortlibComponent extends Component
                 'status' =>  $status,
                 'transaction' => $transaction,
                 'time' => $time,
-                'data' => $transactionData
+                'data' => $transactionData,
+                'handled' => &$handled
             ]
         ]);
 
         $this->Controller->getEventManager()->dispatch($event);
+
+        if(!$handled)
+            throw new Exceptions\UnhandledNotificationException('Payment notification is unhandled'); 
     }
 
     /**
