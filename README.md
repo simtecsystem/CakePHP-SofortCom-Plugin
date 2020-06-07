@@ -56,9 +56,42 @@ In your app.local.php add an entry for SofortCom
 
 # Usage
 
+In your payment handling controller:
+
+```php
+    // Load the component
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('SofortCom.Sofortlib');
+    }
+
+    // Sample checkout
+    private function _checkoutSofortCom($orderId)
+    {
+        $this->Sofortlib->setAmount(12.34);
+        $this->Sofortlib->setCurrencyCode('EUR');
+        $this->Sofortlib->setReason('Buying Great Stuff', 'Order ' . $orderId); // Displayed as payment reason to the user
+        $this->Sofortlib->setSuccessUrl('http://your-shop.example.com/success'); // The URL your clients are redirected upon success
+        $this->Sofortlib->setAbortUrl('http://your-shop.example.com/abort'); // The URL your clients are redirected upon abort
+        $this->Sofortlib->setShopId($orderId);
+
+        try
+        {
+            $this->Sofortlib->PaymentRedirect();
+        } catch (SofortLibException $ex) {
+            Log::error(sprintf('SofortCom payment redirect errors: "%s"', var_export($ex->errors, true)));
+            $this->Flash->set(__('Could not redirect to online banking (Error {0}). Please choose another payment method.', $ex->getMessage()));
+            return $this->redirect('http://your-shop.example.com/recover');
+        }
+    }
+```
+
+## Event handlers
+
 You must implement at least the following eventhandler:
 
-## SofortCom.Controller.Component.SofortlibComponent.Notify
+### SofortCom.Controller.Component.SofortlibComponent.Notify
 
 ```php
 \Cake\Event\EventManager::instance()->on('SofortCom.Controller.Component.SofortlibComponent.Notify',
@@ -79,7 +112,7 @@ function ($event, $args)
 });
 ```
 
-## SofortCom.Controller.Component.SofortlibComponent.NewTransaction
+### SofortCom.Controller.Component.SofortlibComponent.NewTransaction
 
 This event is optional and fired before the user is redirected to the payment URL.
 It provides the following arguments:
