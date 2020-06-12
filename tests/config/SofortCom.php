@@ -9,16 +9,6 @@ return [
         // Encryption key for sending encrypted data to SofortCom
         'encryptionKey' => 'A_SECRET_KEY_MUST_BE_32_BYTES_LONG',
 
-        // This is the name of your function in your AppController
-        // that will be called when the notification url gets called
-        // Your function will get the arguments:
-        // shop_id          Identifier for your order, shopping cart etc.
-        // status           status for which this notification was sent
-        // transaction      transaction number of notification message
-        // time             timestamp of the notification message
-        // transationData   SofortLibTransactionData
-        'notifyCallback' => 'afterSofortComNotification',
-
         // Default CurrencyCode.
         // You can override this when preparing the payment request.
         'currency' => 'EUR',
