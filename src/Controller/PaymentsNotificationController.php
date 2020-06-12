@@ -13,10 +13,10 @@ class PaymentsNotificationController extends AppController
 
     public $components = array('SofortCom.Sofortlib');
 
-    public function Notify($eShopId, $status)
+    public function Notify($eShopId, $notifyOn)
     {
         $ip = $this->request->clientIp();
-        $this->Sofortlib->HandleNotifyUrl($eShopId, $status, $ip);
+        $this->Sofortlib->HandleNotifyUrl($eShopId, $notifyOn, $ip);
         $this->autoRender = false;
     }
 }

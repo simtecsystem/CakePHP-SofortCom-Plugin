@@ -19,7 +19,7 @@ class SofortlibComponent extends Component
     private $Sofortueberweisung;
     private $Config;
     private $protectedMethods = ['setnotificationurl', 'sendrequest'];
-    private $states = ['loss', 'pending', 'received', 'refunded', 'untraceable'];
+    private $notifyOnReasons = ['loss', 'pending', 'received', 'refunded'];
     private $shop_id;
     private $Notifications;
     private $encryptionKey;
@@ -90,7 +90,7 @@ class SofortlibComponent extends Component
         return new \SofortLibTransactionData($this->Config['configkey']);
     }
 
-    public function HandleNotifyUrl($eShopId, $status, $ip, $rawPostStream = 'php://input')
+    public function HandleNotifyUrl($eShopId, $notifyOn, $ip, $rawPostStream = 'php://input')
     {
         $shop_id = Security::decrypt(
                 Base64Url::decode($eShopId),
@@ -100,7 +100,7 @@ class SofortlibComponent extends Component
         $transaction = $notification->getTransactionId();
         $time = $notification->getTime();
 
-        $this->Notifications->Add($transaction, $status, $time, $ip);
+        $this->Notifications->Add($transaction, $notifyOn, $time, $ip);
 
         $transactionData = $this->BuildTransactionData();
         $transactionData->addTransaction($transaction);
@@ -112,7 +112,7 @@ class SofortlibComponent extends Component
         [
             'args' => [
                 'shop_id' => $shop_id,
-                'status' =>  $status,
+                'notifyOn' =>  $notifyOn,
                 'transaction' => $transaction,
                 'time' => $time,
                 'data' => $transactionData,
@@ -123,7 +123,7 @@ class SofortlibComponent extends Component
         $this->Controller->getEventManager()->dispatch($event);
 
         if(!$handled)
-            throw new Exceptions\UnhandledNotificationException('Payment notification is unhandled'); 
+            throw new Exceptions\UnhandledNotificationException('Payment notification is unhandled');
     }
 
     /**
@@ -147,11 +147,11 @@ class SofortlibComponent extends Component
             'action' => 'Notify',
             'plugin' => 'SofortCom',
             'eShopId' => $eShopId];
-        foreach ($this->states as $state)
+        foreach ($this->notifyOnReasons as $notifyOn)
         {
-            $urlOptions['status'] = $state;
+            $urlOptions['notifyOn'] = $notifyOn;
             $notificationUrl = Router::url($urlOptions, true);
-            $this->Sofortueberweisung->setNotificationUrl($notificationUrl, $state);
+            $this->Sofortueberweisung->setNotificationUrl($notificationUrl, $notifyOn);
         }
 
         $this->Sofortueberweisung->sendRequest();

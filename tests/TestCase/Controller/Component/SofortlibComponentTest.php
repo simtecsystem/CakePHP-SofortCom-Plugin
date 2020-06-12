@@ -83,7 +83,7 @@ class SofortlibComponentTest extends TestCase {
     {
         $eShopId = Base64Url::encode(Security::encrypt('shop', Configure::read('Security.salt')));
         $this->expectException(Exceptions\NotificationException::class);
-        $this->Component->HandleNotifyUrl($eShopId, 'state', '1.2.3.4', 'php://memory');
+        $this->Component->HandleNotifyUrl($eShopId, 'pending', '1.2.3.4', 'php://memory');
     }
 
     public function testHandleNotifyUrl()
@@ -119,7 +119,7 @@ class SofortlibComponentTest extends TestCase {
         $pComponent->Notifications = $this->getMockForModel('SofortCom.Notifications', ['Add']);
         $pComponent->Notifications->expects($this->once())
             ->method('Add')
-            ->with('trans', 'state', '2020-01-01', '1.2.3.4');
+            ->with('trans', 'pending', '2020-01-01', '1.2.3.4');
         $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
 
         $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));
@@ -130,7 +130,7 @@ class SofortlibComponentTest extends TestCase {
             $args['handled'] = true;
         });
 
-        $component->HandleNotifyUrl($eShopId, 'state', '1.2.3.4', 'php://memory');
+        $component->HandleNotifyUrl($eShopId, 'pending', '1.2.3.4', 'php://memory');
     }
 
     public function testHandleNotifyUrlThrowsExceptionIfUnhandled()
@@ -166,14 +166,14 @@ class SofortlibComponentTest extends TestCase {
         $pComponent->Notifications = $this->getMockForModel('SofortCom.Notifications', ['Add']);
         $pComponent->Notifications->expects($this->once())
             ->method('Add')
-            ->with('trans', 'state', '2020-01-01', '1.2.3.4');
+            ->with('trans', 'pending', '2020-01-01', '1.2.3.4');
         $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
 
         $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));
 
         $exceptionThrown = false;
         try {
-            $component->HandleNotifyUrl($eShopId, 'state', '1.2.3.4', 'php://memory');
+            $component->HandleNotifyUrl($eShopId, 'pending', '1.2.3.4', 'php://memory');
         } catch (Exceptions\UnhandledNotificationException $th) {
             $exceptionThrown = true;
         }
@@ -182,7 +182,7 @@ class SofortlibComponentTest extends TestCase {
         $this->assertEventFiredWith('SofortCom.Controller.Component.SofortlibComponent.Notify',
             'args', [
                 'shop_id' => 'order_123',
-                'status' =>'state',
+                'notifyOn' => 'pending',
                 'transaction' => 'trans',
                 'time' => '2020-01-01',
                 'data' => $mTransactionData,
@@ -209,7 +209,7 @@ class SofortlibComponentTest extends TestCase {
                 ])
             ->getMock();
 
-        $this->PComponent->Sofortueberweisung->expects($this->exactly(5))
+        $this->PComponent->Sofortueberweisung->expects($this->exactly(4))
             ->method('setNotificationUrl')
             ->with($this->stringStartsWith('http://example.com/SofortComPayment/Notify/'));
 

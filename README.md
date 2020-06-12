@@ -100,7 +100,7 @@ function ($event, $args)
   // $args =
   // [
   //   'shop_id' => 'order123',                   // Some id defined by you upon payment initialization
-  //   'notifyOn' =>'pending',                    // SofortCom notification URL suffix
+  //   'notifyOn' => 'pending',                   // SofortCom notification URL suffix
   //   'transaction' => '99999-53245-5483-4891',  // SofortCom transaction id
   //   'time' => '2010-04-14T19:01:08+02:00',     // SofortCom timestamp of notification
   //   'data' => {object},                        // Instance of \SofortLibTransactionData

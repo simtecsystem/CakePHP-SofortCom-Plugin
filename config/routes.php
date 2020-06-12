@@ -9,12 +9,12 @@ Router::plugin(
     function (RouteBuilder $routes)
     {
         /* Add route for handling payment notifications */
-        $routes->post('/Notify/:eShopId/:status',
+        $routes->post('/Notify/:eShopId/:notifyOn',
             [
                 'controller' => 'PaymentsNotification',
                 'action' => 'Notify'
             ],
         )
-            ->setPass(['eShopId', 'status']);
+            ->setPass(['eShopId', 'notifyOn']);
     }
 );

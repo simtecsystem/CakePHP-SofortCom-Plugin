@@ -26,18 +26,18 @@ class NotificationsTable extends Table
             ->notEmptyString('time');
 
         $validator
-            ->requirePresence('status')
-            ->notEmptyString('status');
+            ->requirePresence('notify_on')
+            ->notEmptyString('notify_on');
 
         return $validator;
     }
 
-    public function Add($transaction, $status, $time, $ip)
+    public function Add($transaction, $notifyOn, $time, $ip)
     {
         $record = $this->newEntity(
             [
                 'sc_transaction' => $transaction,
-                'status' => $status,
+                'notify_on' => $notifyOn,
                 'time' => $time,
                 'ip' => $ip
             ]

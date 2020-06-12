@@ -23,12 +23,12 @@ class NotificationsTest extends TestCase
 
     public function testAdd()
     {
-        $added = $this->Notifications->Add('trans', 'state', 'time', '1.2.3.4');
-        $actual = $this->Notifications->findByStatus('state')->first();
+        $added = $this->Notifications->Add('trans', 'pending', 'time', '1.2.3.4');
+        $actual = $this->Notifications->findByNotifyOn('pending')->first();
         $this->assertEquals('trans', $actual->sc_transaction);
-        $this->assertEquals('state', $actual->status);
+        $this->assertEquals('pending', $actual->notify_on);
         $this->assertEquals('time', $actual->time);
         $this->assertEquals('1.2.3.4', $actual->ip);
-        $this->assertEquals($actual->status, $added->status);
+        $this->assertEquals($actual->notify_on, $added->notify_on);
     }
 }
