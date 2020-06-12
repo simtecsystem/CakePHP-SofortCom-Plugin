@@ -9,13 +9,25 @@ CakePHP Sofort.com payment plugin
 
 # Installation
 
-If you are using composer simply add the following requirement to your composer file:
+If you are using composer simply add the plugin using the command
 
 ```bash
 composer require hakito/sofortcom-plugin
 ```
 
-Otherwise download the plugin to app/Plugin/SofortCom.
+Otherwise download the plugin to app/Plugin/SofortCom. Add a PSR-4 compatible autoloader to your bootstrap.
+
+Load the plugin in your bootstrap:
+
+```php
+public function bootstrap()
+{
+    // Call parent to load bootstrap from files.
+    parent::bootstrap();
+
+    $this->addPlugin(\SofortCom\Plugin::class, ['routes' => true]);
+}
+```
 
 # Creating tables
 
