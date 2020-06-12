@@ -5,13 +5,6 @@
     "type": "cakephp-plugin",
     "license": "GPL-2.0",
     "homepage": "https://github.com/hakito/CakePHP-SofortCom-Plugin",
-    "repositories":
-    [
-        {
-            "type": "vcs",
-            "url": "https://github.com/hakito/SofortLib-PHP-Payment"
-        }
-    ],
     "authors": [
         {
             "name": "Gerd Katzenbeisser",
@@ -30,7 +23,7 @@
     },
     "require": {
         "cakephp/cakephp": "^3.7",
-        "smichaelsen/sofortlib-php-payment": "dev-develop",
+        "smichaelsen/sofortlib-php-payment": "dev-develop#eb3086da398fae56cd20d12cf413db9f809862e4",
         "spomky-labs/base64url": "^2.0"
     },
     "require-dev": {
