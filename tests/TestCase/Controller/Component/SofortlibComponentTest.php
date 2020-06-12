@@ -127,7 +127,7 @@ class SofortlibComponentTest extends TestCase {
         \Cake\Event\EventManager::instance()->on('SofortCom.Controller.Component.SofortlibComponent.Notify',
         function ($event, $args)
         {
-            $args['handled'] = true;
+            return ['handled' => true];
         });
 
         $component->HandleNotifyUrl($eShopId, 'pending', '1.2.3.4', 'php://memory');
@@ -185,8 +185,7 @@ class SofortlibComponentTest extends TestCase {
                 'notifyOn' => 'pending',
                 'transaction' => 'trans',
                 'time' => '2020-01-01',
-                'data' => $mTransactionData,
-                'handled' => false
+                'data' => $mTransactionData
             ], $this->Controller->getEventManager());
     }
 

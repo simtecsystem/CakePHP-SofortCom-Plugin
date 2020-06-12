@@ -104,11 +104,11 @@ function ($event, $args)
   //   'transaction' => '99999-53245-5483-4891',  // SofortCom transaction id
   //   'time' => '2010-04-14T19:01:08+02:00',     // SofortCom timestamp of notification
   //   'data' => {object},                        // Instance of \SofortLibTransactionData
-  //   'handled' => &bool                         // Reference bool
   // ]
 
-  $args['handled'] = true; // If you don't set the handled flag to true
-                           // the plugin will throw an UnhandledNotificationException
+
+  return ['handled' => true]; // If you don't set the handled flag to true
+                              // the plugin will throw an UnhandledNotificationException
 });
 ```
 
