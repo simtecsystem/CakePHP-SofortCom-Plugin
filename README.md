@@ -91,10 +91,10 @@ In your payment handling controller:
 
 You must implement at least the following eventhandler:
 
-### SofortCom.Controller.Component.SofortlibComponent.Notify
+### SofortCom.Notify
 
 ```php
-\Cake\Event\EventManager::instance()->on('SofortCom.Controller.Component.SofortlibComponent.Notify',
+\Cake\Event\EventManager::instance()->on('SofortCom.Notify',
 function ($event, $args)
 {
   // $args =
@@ -112,7 +112,7 @@ function ($event, $args)
 });
 ```
 
-### SofortCom.Controller.Component.SofortlibComponent.NewTransaction
+### SofortCom.NewTransaction
 
 This event is optional and fired before the user is redirected to the payment URL.
 It provides the following arguments:

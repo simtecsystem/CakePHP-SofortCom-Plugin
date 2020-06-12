@@ -107,7 +107,7 @@ class SofortlibComponent extends Component
         $transactionData->sendRequest();
         $transactionData->setNumber(1);
 
-        $event = new Event('SofortCom.Controller.Component.SofortlibComponent.Notify', $this,
+        $event = new Event('SofortCom.Notify', $this,
         [
             'args' => [
                 'shop_id' => $shop_id,
@@ -167,7 +167,7 @@ class SofortlibComponent extends Component
 
         $this->ShopTransactions->Add($transaction, $this->shop_id);
 
-        $event = new Event('SofortCom.Controller.Component.SofortlibComponent.NewTransaction', $this,
+        $event = new Event('SofortCom.NewTransaction', $this,
         [
             'args' => [
                 'transaction' => $transaction,

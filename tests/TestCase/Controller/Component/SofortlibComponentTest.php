@@ -124,7 +124,7 @@ class SofortlibComponentTest extends TestCase {
 
         $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));
 
-        \Cake\Event\EventManager::instance()->on('SofortCom.Controller.Component.SofortlibComponent.Notify',
+        \Cake\Event\EventManager::instance()->on('SofortCom.Notify',
         function ($event, $args)
         {
             return ['handled' => true];
@@ -179,7 +179,7 @@ class SofortlibComponentTest extends TestCase {
         }
         $this->assertTrue($exceptionThrown);
 
-        $this->assertEventFiredWith('SofortCom.Controller.Component.SofortlibComponent.Notify',
+        $this->assertEventFiredWith('SofortCom.Notify',
             'args', [
                 'shop_id' => 'order_123',
                 'notifyOn' => 'pending',
@@ -264,7 +264,7 @@ class SofortlibComponentTest extends TestCase {
 
         $this->Component->PaymentRedirect();
 
-        $this->assertEventFiredWith('SofortCom.Controller.Component.SofortlibComponent.NewTransaction',
+        $this->assertEventFiredWith('SofortCom.NewTransaction',
         'args', [
             'transaction' => 'trans',
             'payment_url' => 'https://sofort.example.com'
