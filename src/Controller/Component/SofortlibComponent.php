@@ -10,6 +10,9 @@ use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
 
+use Sofort\SofortLib\Sofortueberweisung;
+use Sofort\SofortLib\Notification;
+
 use SofortCom\Exceptions;
 use SofortCom\Model\Table\Notifications;
 use SofortCom\Model\Table\ShopTransactions;
@@ -32,7 +35,7 @@ class SofortlibComponent extends Component
         parent::initialize($config);
         $this->Config = Configure::read('SofortCom');
         $this->encryptionKey = $this->Config['encryptionKey'];
-        $this->Sofortueberweisung = new \Sofortueberweisung($this->Config['configkey']);
+        $this->Sofortueberweisung = new Sofortueberweisung($this->Config['configkey']);
         if (!empty($this->Config['currency']))
             $this->setCurrencyCode($this->Config['currency']);
         $this->Notifications = TableRegistry::getTableLocator()->get('SofortCom.Notifications');
@@ -76,7 +79,7 @@ class SofortlibComponent extends Component
 
     protected function ParseNotification($rawPostStream)
     {
-        $notification = new \SofortLibNotification();
+        $notification = new Notification();
         $success = $notification->getNotification(
                 file_get_contents($rawPostStream)
         );

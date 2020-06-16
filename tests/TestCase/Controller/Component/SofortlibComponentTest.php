@@ -13,6 +13,9 @@ use Cake\Utility\Security;
 
 use hakito\Publisher\Published;
 
+use Sofort\SofortLib\Sofortueberweisung;
+use Sofort\SofortLib\Notification;
+
 use SofortCom\Controller\Component\SofortlibComponent;
 use SofortCom\Exceptions;
 
@@ -47,7 +50,7 @@ class SofortlibComponentTest extends TestCase {
     public function testInitialized()
     {
         $this->assertEquals(Configure::read('SofortCom'), $this->PComponent->Config);
-        $this->assertInstanceOf(\Sofortueberweisung::class, $this->PComponent->Sofortueberweisung);
+        $this->assertInstanceOf(Sofortueberweisung::class, $this->PComponent->Sofortueberweisung);
         $this->assertEquals($this->Controller, $this->PComponent->Controller);
         $this->assertInstanceOf(\SofortCom\Model\Table\NotificationsTable::class, $this->PComponent->Notifications);
         $this->assertInstanceOf(\SofortCom\Model\Table\ShopTransactionsTable::class, $this->PComponent->ShopTransactions);
@@ -61,7 +64,7 @@ class SofortlibComponentTest extends TestCase {
 
     public function testCallForwardsCall()
     {
-        $this->PComponent->Sofortueberweisung = $this->getMockBuilder(\Sofortueberweisung::class)
+        $this->PComponent->Sofortueberweisung = $this->getMockBuilder(Sofortueberweisung::class)
             ->disableOriginalConstructor()
             ->setMethods(['setCurrencyCode'])
             ->getMock();
@@ -88,7 +91,7 @@ class SofortlibComponentTest extends TestCase {
 
     public function testHandleNotifyUrl()
     {
-        $notification = new \SofortLibNotification();
+        $notification = new Notification();
         $pNotification = new Published($notification);
         $pNotification->_transactionId = 'trans';
         $pNotification->_time = '2020-01-01';
@@ -135,7 +138,7 @@ class SofortlibComponentTest extends TestCase {
 
     public function testHandleNotifyUrlThrowsExceptionIfUnhandled()
     {
-        $notification = new \SofortLibNotification();
+        $notification = new Notification();
         $pNotification = new Published($notification);
         $pNotification->_transactionId = 'trans';
         $pNotification->_time = '2020-01-01';
@@ -199,7 +202,7 @@ class SofortlibComponentTest extends TestCase {
     {
         $this->Component->setShopId('shop');
 
-        $this->PComponent->Sofortueberweisung = $this->getMockBuilder(\Sofortueberweisung::class)
+        $this->PComponent->Sofortueberweisung = $this->getMockBuilder(Sofortueberweisung::class)
             ->disableOriginalConstructor()
             ->setMethods(
                 [
