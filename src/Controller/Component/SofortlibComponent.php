@@ -108,6 +108,7 @@ class SofortlibComponent extends Component
 
         $transactionData = $this->BuildTransactionData();
         $transactionData->addTransaction($transaction);
+        $transactionData->setApiVersion('2.0');
         $transactionData->sendRequest();
         $transactionData->setNumber(1);
 
