@@ -15,6 +15,8 @@ class NotificationsFixture extends TestFixture
 		'sc_transaction' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 27, 'key' => 'index', 'collate' => 'ascii_general_ci', 'comment' => 'StatusNotification: Transaction number', 'charset' => 'ascii'],
 		'time' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 25, 'collate' => 'ascii_general_ci', 'comment' => 'StatusNotification: Date and time (with time zone) according to ISO 8601', 'charset' => 'ascii'],
 		'notify_on' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 15, 'collate' => 'ascii_general_ci', 'comment' => 'Notification Reason', 'charset' => 'ascii'],
+		'status' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 15, 'collate' => 'ascii_general_ci', 'charset' => 'ascii'],
+		'status_reason' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 30, 'collate' => 'ascii_general_ci', 'charset' => 'ascii'],
 		'ip' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 40, 'key' => 'index', 'collate' => 'ascii_general_ci', 'comment' => 'Client IP address', 'charset' => 'ascii'],
         '_constraints' => [
 			'primary' => ['type' => 'primary', 'columns' => ['id']],

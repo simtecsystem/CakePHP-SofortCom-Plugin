@@ -1,7 +1,7 @@
 <?php
 use Migrations\AbstractMigration;
 
-class AlterTransactionOnSofortComNotifications extends AbstractMigration
+class AlterSCTransactionOnSofortComNotifications extends AbstractMigration
 {
     /**
      * Change Method.

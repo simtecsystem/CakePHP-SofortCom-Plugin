@@ -115,7 +115,7 @@ function ($event, $args)
   //   'notifyOn' => 'pending',                   // SofortCom notification URL suffix
   //   'transaction' => '99999-53245-5483-4891',  // SofortCom transaction id
   //   'time' => '2010-04-14T19:01:08+02:00',     // SofortCom timestamp of notification
-  //   'data' => {object},                        // Instance of \SofortLibTransactionData
+  //   'data' => {object},                        // Instance of Sofort\SofortLib\TransactionData
   // ]
 
 

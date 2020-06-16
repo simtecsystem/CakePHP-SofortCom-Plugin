@@ -13,8 +13,9 @@ use Cake\Utility\Security;
 
 use hakito\Publisher\Published;
 
-use Sofort\SofortLib\Sofortueberweisung;
 use Sofort\SofortLib\Notification;
+use Sofort\SofortLib\Sofortueberweisung;
+use Sofort\SofortLib\TransactionData;
 
 use SofortCom\Controller\Component\SofortlibComponent;
 use SofortCom\Exceptions;
@@ -25,6 +26,9 @@ class SofortlibComponentTest extends TestCase {
     private $Component;
 
     private $originalConfig;
+
+    public $fixtures = ['plugin.SofortCom.Notifications'];
+
     /**
      * setUp method
      *
@@ -98,7 +102,6 @@ class SofortlibComponentTest extends TestCase {
 
         $component = $this->getMockBuilder(SofortlibComponent::class)
             ->setConstructorArgs([$this->registry])
-            ->disableOriginalConstructor()
             ->setMethods(['ParseNotification', 'BuildTransactionData'])
             ->getMock();
         $component->startup($this->startUp);
@@ -107,22 +110,21 @@ class SofortlibComponentTest extends TestCase {
             ->method('ParseNotification')
             ->willReturn($notification);
 
-        $mTransactionData = $this->getMockBuilder(\SofortLibTransactionData::class)
+        $mTransactionData = $this->getMockBuilder(TransactionData::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addTransaction', 'sendRequest', 'setNumber'])->getMock();
+            ->setMethods(['addTransaction', 'sendRequest', 'setNumber', 'getStatus', 'getStatusReason'])->getMock();
         $mTransactionData->expects($this->once())->method('addTransaction')->with('trans');
         $mTransactionData->expects($this->once())->method('sendRequest');
         $mTransactionData->expects($this->once())->method('setNumber')->with(1);
+        $mTransactionData->expects($this->once())->method('getStatus')->willReturn('untraceable');
+        $mTransactionData->expects($this->once())->method('getStatusReason')->willReturn('sofort_bank_account_needed');
 
         $component->expects($this->once())
             ->method('BuildTransactionData')
             ->willReturn($mTransactionData);
 
         $pComponent = new Published($component, SofortlibComponent::class);
-        $pComponent->Notifications = $this->getMockForModel('SofortCom.Notifications', ['Add']);
-        $pComponent->Notifications->expects($this->once())
-            ->method('Add')
-            ->with('trans', 'pending', '2020-01-01', '1.2.3.4');
+
         $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
 
         $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));
@@ -134,6 +136,21 @@ class SofortlibComponentTest extends TestCase {
         });
 
         $component->HandleNotifyUrl($eShopId, 'pending', '1.2.3.4', 'php://memory');
+
+
+        $expectedRecord =
+        [
+            'id' => 1,
+            'sc_transaction' => 'trans',
+            'time' => '2020-01-01',
+            'notify_on' => 'pending',
+            'status' => 'untraceable',
+            'status_reason' => 'sofort_bank_account_needed',
+            'ip' => '1.2.3.4'
+
+        ];
+        $notificationRecord = array_intersect_key($pComponent->Notifications->get(1)->toArray(), $expectedRecord);
+        $this->assertEquals($expectedRecord, $notificationRecord);
     }
 
     public function testHandleNotifyUrlThrowsExceptionIfUnhandled()
@@ -145,7 +162,6 @@ class SofortlibComponentTest extends TestCase {
 
         $component = $this->getMockBuilder(SofortlibComponent::class)
             ->setConstructorArgs([$this->registry])
-            ->disableOriginalConstructor()
             ->setMethods(['ParseNotification', 'BuildTransactionData'])
             ->getMock();
         $component->startup($this->startUp);
@@ -154,7 +170,7 @@ class SofortlibComponentTest extends TestCase {
             ->method('ParseNotification')
             ->willReturn($notification);
 
-        $mTransactionData = $this->getMockBuilder(\SofortLibTransactionData::class)
+        $mTransactionData = $this->getMockBuilder(TransactionData::class)
             ->disableOriginalConstructor()
             ->setMethods(['addTransaction', 'sendRequest', 'setNumber'])->getMock();
         $mTransactionData->expects($this->once())->method('addTransaction')->with('trans');
@@ -166,10 +182,6 @@ class SofortlibComponentTest extends TestCase {
             ->willReturn($mTransactionData);
 
         $pComponent = new Published($component, SofortlibComponent::class);
-        $pComponent->Notifications = $this->getMockForModel('SofortCom.Notifications', ['Add']);
-        $pComponent->Notifications->expects($this->once())
-            ->method('Add')
-            ->with('trans', 'pending', '2020-01-01', '1.2.3.4');
         $pComponent->encryptionKey = 'A dummy key to ensure encyrption key is used';
 
         $eShopId = Base64Url::encode(Security::encrypt('order_123', $pComponent->encryptionKey));

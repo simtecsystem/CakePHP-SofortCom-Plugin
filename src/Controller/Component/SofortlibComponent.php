@@ -10,8 +10,9 @@ use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
 
-use Sofort\SofortLib\Sofortueberweisung;
 use Sofort\SofortLib\Notification;
+use Sofort\SofortLib\Sofortueberweisung;
+use Sofort\SofortLib\TransactionData;
 
 use SofortCom\Exceptions;
 use SofortCom\Model\Table\Notifications;
@@ -90,7 +91,7 @@ class SofortlibComponent extends Component
 
     protected function BuildTransactionData()
     {
-        return new \SofortLibTransactionData($this->Config['configkey']);
+        return new TransactionData($this->Config['configkey']);
     }
 
     public function HandleNotifyUrl($eShopId, $notifyOn, $ip, $rawPostStream = 'php://input')
@@ -103,7 +104,7 @@ class SofortlibComponent extends Component
         $transaction = $notification->getTransactionId();
         $time = $notification->getTime();
 
-        $this->Notifications->Add($transaction, $notifyOn, $time, $ip);
+        $notification = $this->Notifications->Add($transaction, $notifyOn, $time, $ip);
 
         $transactionData = $this->BuildTransactionData();
         $transactionData->addTransaction($transaction);
@@ -120,6 +121,10 @@ class SofortlibComponent extends Component
                 'data' => $transactionData,
             ]
         ]);
+
+        $notification->status = $transactionData->getStatus();
+        $notification->status_reason = $transactionData->getStatusReason();
+        $this->Notifications->save($notification);
 
         $this->Controller->getEventManager()->dispatch($event);
 
