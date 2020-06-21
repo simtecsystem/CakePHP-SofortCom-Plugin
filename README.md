@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/hakito/CakePHP-SofortCom-Plugin.svg?branch=master)](https://travis-ci.org/hakito/CakePHP-SofortCom-Plugin)
 [![Coverage Status](https://coveralls.io/repos/github/hakito/CakePHP-SofortCom-Plugin/badge.svg?branch=master)](https://coveralls.io/github/hakito/CakePHP-SofortCom-Plugin?branch=master)
 
-CakePHP Sofort.com payment plugin
+CakePHP 3.x Sofort.com payment plugin
 
 # Installation
 
