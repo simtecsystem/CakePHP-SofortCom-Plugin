@@ -12,7 +12,7 @@ use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
 
 use hakito\Publisher\Published;
-
+use PHPUnit\Framework\MockObject\MockObject;
 use Sofort\SofortLib\Notification;
 use Sofort\SofortLib\Sofortueberweisung;
 use Sofort\SofortLib\TransactionData;
@@ -25,18 +25,12 @@ class SofortlibComponentTest extends TestCase {
     /** @var SofortlibComponent */
     private $Component;
 
-    private $originalConfig;
-
     public $fixtures = ['plugin.SofortCom.Notifications'];
 
-    /**
-     * setUp method
-     *
-     * @return void
-     */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
+        $this->loadPlugins([\SofortCom\Plugin::class => ['routes' => true]]);
 
         $this->Controller = $this->getMockBuilder('\Cake\Controller\Controller')
             ->setMethods(['redirect'])
@@ -100,6 +94,7 @@ class SofortlibComponentTest extends TestCase {
         $pNotification->_transactionId = 'trans';
         $pNotification->_time = '2020-01-01';
 
+        /** @var MockObject|SofortlibComponent */
         $component = $this->getMockBuilder(SofortlibComponent::class)
             ->setConstructorArgs([$this->registry])
             ->setMethods(['ParseNotification', 'BuildTransactionData'])
@@ -160,6 +155,7 @@ class SofortlibComponentTest extends TestCase {
         $pNotification->_transactionId = 'trans';
         $pNotification->_time = '2020-01-01';
 
+        /** @var MockObject|SofortlibComponent */
         $component = $this->getMockBuilder(SofortlibComponent::class)
             ->setConstructorArgs([$this->registry])
             ->setMethods(['ParseNotification', 'BuildTransactionData'])

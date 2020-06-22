@@ -3,16 +3,14 @@ namespace PayPal\Test\TestCase\Controller;
 
 use Cake\TestSuite\TestCase;
 use Cake\TestSuite\IntegrationTestTrait;
-use PayPal\Test\TestApp\Application;
-
-use SofortCom\PaymentController;
 
 class PaymentsNotificationControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
-    public function setUp()
+    public function setUp(): void
     {
+        parent::setup();
         $this->disableErrorHandlerMiddleware();
         $this->component = $this->getMockBuilder(\SofortCom\Controller\Component\SofortlibComponent::class)
             ->disableOriginalConstructor()

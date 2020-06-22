@@ -7,13 +7,13 @@ use Cake\Validation\Validator;
 
 class ShopTransactionsTable extends Table
 {
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         $this->setTable('SofortComShopTransactions');
         $this->addBehavior('Timestamp');
     }
 
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->requirePresence('sc_transaction')

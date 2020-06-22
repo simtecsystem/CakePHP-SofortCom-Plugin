@@ -8,14 +8,14 @@ use Cake\Validation\Validator;
 class NotificationsTable extends Table
 {
 
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         $this->setTable('SofortComNotifications');
         $this->displayField = 'id';
         $this->addBehavior('Timestamp');
     }
 
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->requirePresence('sc_transaction')

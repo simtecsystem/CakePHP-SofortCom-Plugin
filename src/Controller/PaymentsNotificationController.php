@@ -4,14 +4,12 @@ namespace SofortCom\Controller;
 
 class PaymentsNotificationController extends AppController
 {
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
 
         $this->loadComponent('SofortCom.Sofortlib', []);
     }
-
-    public $components = array('SofortCom.Sofortlib');
 
     public function Notify($eShopId, $notifyOn)
     {

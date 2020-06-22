@@ -2,23 +2,26 @@
 
 namespace SofortCom\Test\TestCase\Model\Table;
 
-use Cake\Core\Configure;
 use Cake\Event\EventList;
+use Cake\Event\EventManager;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
-use SofortCom\Model\Table\NotificationsTable;
 /**
- * @var \SofortCom\Model\Table\NotificationsTable Notifications
+ * @property \SofortCom\Model\Table\NotificationsTable $Notifications
  */
 class NotificationsTest extends TestCase
 {
     public $fixtures = ['plugin.SofortCom.Notifications'];
 
-    public function setUp()
+    public function setUp(): void
     {
+        parent::setUp();
         $this->Notifications = TableRegistry::getTableLocator()->get('SofortCom.Notifications');
-        $this->Notifications->getEventManager()->setEventList(new EventList());
+
+        /** @var EventManager */
+        $eventManager = $this->Notifications->getEventManager();
+        $eventManager->setEventList(new EventList());
     }
 
     public function testAdd()

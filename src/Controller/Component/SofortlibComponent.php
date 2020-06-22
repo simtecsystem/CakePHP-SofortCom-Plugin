@@ -2,21 +2,16 @@
 namespace SofortCom\Controller\Component;
 
 use Base64Url\Base64Url;
-
 use Cake\Core\Configure;
 use Cake\Controller\Component;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
-
 use Sofort\SofortLib\Notification;
 use Sofort\SofortLib\Sofortueberweisung;
 use Sofort\SofortLib\TransactionData;
-
 use SofortCom\Exceptions;
-use SofortCom\Model\Table\Notifications;
-use SofortCom\Model\Table\ShopTransactions;
 
 class SofortlibComponent extends Component
 {
@@ -31,7 +26,7 @@ class SofortlibComponent extends Component
     /** @var \Controller */
     private $Controller;
 
-    public function initialize($config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
         $this->Config = Configure::read('SofortCom');
@@ -50,12 +45,12 @@ class SofortlibComponent extends Component
 
     /**
      * Forward function calls to Sofortueberweisung
-     * @param type $name Function name
-     * @param type $arguments Function arguments
+     * @param string $name Function name
+     * @param array $arguments Function arguments
      * @return type mixed
      * @throws \InvalidArgumentException when trying to call setnotificationurl() or sendrequest()
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
         if(method_exists($this->Sofortueberweisung, $name))
         {
@@ -150,7 +145,7 @@ class SofortlibComponent extends Component
             throw new \UnexpectedValueException("Encrypted shop_id is empty");
 
         $urlOptions = [
-            '_method' => 'post',
+            '_method' => 'POST',
             'controller' => 'PaymentsNotification',
             'action' => 'Notify',
             'plugin' => 'SofortCom',
