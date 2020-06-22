@@ -88,7 +88,7 @@ class SofortlibComponentTest extends TestCase {
 
     public function testHandleNotifyUrlThrowsNotificationException()
     {
-        $eShopId = Base64Url::encode(Security::encrypt('shop', Configure::read('Security.salt')));
+        $eShopId = Base64Url::encode(Security::encrypt('shop', Configure::read('SofortCom.encryptionKey')));
         $this->expectException(Exceptions\NotificationException::class);
         $this->Component->HandleNotifyUrl($eShopId, 'pending', '1.2.3.4', 'php://memory');
     }
