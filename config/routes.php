@@ -13,7 +13,7 @@ Router::plugin(
             [
                 'controller' => 'PaymentsNotification',
                 'action' => 'Notify'
-            ],
+            ]
         )
             ->setPass(['eShopId', 'notifyOn']);
     }
