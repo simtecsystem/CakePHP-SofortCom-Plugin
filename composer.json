@@ -1,5 +1,5 @@
 {
-    "name": "hakito/cakephp-sofortcom-plugin",
+    "name": "simtecsystem/cakephp-sofortcom-plugin",
     "description": "CakePHP Sofort.com payment plugin",
     "keywords": ["cakephp", "payment", "sofortcom"],
     "type": "cakephp-plugin",
