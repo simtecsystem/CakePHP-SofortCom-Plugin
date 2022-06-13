@@ -1,15 +1,16 @@
 {
-    "name": "hakito/cakephp-sofortcom-plugin",
+    "name": "simtecsystem/cakephp-sofortcom-plugin",
     "description": "CakePHP Sofort.com payment plugin",
     "keywords": ["cakephp", "payment", "sofortcom"],
     "type": "cakephp-plugin",
     "license": "GPL-2.0",
-    "homepage": "https://github.com/hakito/CakePHP-SofortCom-Plugin",
+    "homepage": "https://github.com/simtecsystem/CakePHP-SofortCom-Plugin",
     "authors": [
         {
             "name": "Gerd Katzenbeisser",
             "homepage": "https://github.com/hakito/CakePHP-SofortCom-Plugin"
-        }
+        },
+
     ],
     "require": {
         "php": ">=5.3.0",
